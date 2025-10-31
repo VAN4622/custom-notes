@@ -33,15 +33,15 @@ let colors = [
 ]
 
 let musicTracks = [
-	{ 
-		name: 'Lofi Hip Hop', 
-		artist: 'Chill Beats', 
-		src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' 
+	{
+		name: 'Lofi Hip Hop',
+		artist: 'Chill Beats',
+		src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
 	},
-	{ 
-		name: 'Relaxing Piano', 
-		artist: 'Peaceful Music', 
-		src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' 
+	{
+		name: 'Relaxing Piano',
+		artist: 'Peaceful Music',
+		src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
 	}
 ]
 
@@ -77,7 +77,7 @@ function getSlugFromURL() {
 // 从 API 加载配置
 async function loadWallConfig() {
 	const slug = getSlugFromURL()
-	
+
 	if (!slug) {
 		console.log('使用默认配置')
 		return true
@@ -520,6 +520,7 @@ function initMusicPlayer() {
 	const volumeSlider = document.getElementById('volumeSlider')
 	const trackName = document.getElementById('trackName')
 	const trackArtist = document.getElementById('trackArtist')
+	let autoPlayAttempted = false
 
 	function updateTrackInfo() {
 		const track = musicTracks[currentTrackIndex]
@@ -529,16 +530,30 @@ function initMusicPlayer() {
 	}
 
 	function autoPlay() {
-		if (audio.src && audio.src !== window.location.href) {
-			const playPromise = audio.play()
-			if (playPromise !== undefined) {
-				playPromise.then(() => {
-					playBtn.textContent = '⏸'
-					isPlaying = true
-				}).catch(err => {
-					console.log('自动播放被阻止，需要用户交互')
-				})
-			}
+		if (autoPlayAttempted || !audio.src || audio.src === window.location.href) {
+			return
+		}
+		autoPlayAttempted = true
+
+		const playPromise = audio.play()
+		if (playPromise !== undefined) {
+			playPromise.then(() => {
+				playBtn.textContent = '⏸'
+				isPlaying = true
+			}).catch(err => {
+				console.log('自动播放被阻止，等待用户交互')
+				// 添加一次性点击监听器，用户点击页面任何地方时自动播放
+				const startPlayOnInteraction = () => {
+					audio.play().then(() => {
+						playBtn.textContent = '⏸'
+						isPlaying = true
+						document.removeEventListener('click', startPlayOnInteraction)
+						document.removeEventListener('touchstart', startPlayOnInteraction)
+					}).catch(() => { })
+				}
+				document.addEventListener('click', startPlayOnInteraction, { once: true })
+				document.addEventListener('touchstart', startPlayOnInteraction, { once: true })
+			})
 		}
 	}
 
@@ -603,9 +618,23 @@ function initMusicPlayer() {
 	})
 
 	updateTrackInfo()
-	
-	// 尝试自动播放（某些浏览器可能会阻止）
-	setTimeout(autoPlay, 1000)
+
+	// 尝试自动播放
+	setTimeout(autoPlay, 500)
+
+	// 设置音量为静音后自动播放（绕过某些浏览器限制）
+	audio.muted = true
+	audio.play().then(() => {
+		// 成功播放后取消静音
+		setTimeout(() => {
+			audio.muted = false
+			playBtn.textContent = '⏸'
+			isPlaying = true
+		}, 100)
+	}).catch(() => {
+		// 如果还是失败，等待用户交互
+		audio.muted = false
+	})
 }
 
 // 初始化应用
