@@ -55,7 +55,7 @@ let spawnInterval = isMobile ? 700 : 400
 let zIndexCursor = 200
 
 let settings = {
-	spawnSpeed: 50,
+	spawnSpeed: 100,
 	autoSpawn: true,
 	showAnimations: true
 }
@@ -528,6 +528,20 @@ function initMusicPlayer() {
 		audio.src = track.src
 	}
 
+	function autoPlay() {
+		if (audio.src && audio.src !== window.location.href) {
+			const playPromise = audio.play()
+			if (playPromise !== undefined) {
+				playPromise.then(() => {
+					playBtn.textContent = '⏸'
+					isPlaying = true
+				}).catch(err => {
+					console.log('自动播放被阻止，需要用户交互')
+				})
+			}
+		}
+	}
+
 	function togglePlay() {
 		if (!audio.src || audio.src === window.location.href) {
 			alert('请先添加音乐文件！\n\n提示：在数据库中配置音乐外链地址')
@@ -589,6 +603,9 @@ function initMusicPlayer() {
 	})
 
 	updateTrackInfo()
+	
+	// 尝试自动播放（某些浏览器可能会阻止）
+	setTimeout(autoPlay, 1000)
 }
 
 // 初始化应用
