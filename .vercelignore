@@ -1,0 +1,11 @@
+# 只忽略这些文件，不要忽略源代码
+node_modules
+.env
+.env.local
+*.log
+.DS_Store
+README.md
+DEPLOYMENT.md
+CHECKLIST.md
+test-local.md
+START_HERE.md
