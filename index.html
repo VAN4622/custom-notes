@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>便签墙</title>
+	<link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+	<div id="board"></div>
+
+	<!-- 设置面板 -->
+	<div id="settingsPanel" class="settings-panel">
+		<h3>设置</h3>
+		<div class="setting-item">
+			<label>
+				生成速度
+				<span class="value-display" id="spawnSpeedValue">50%</span>
+			</label>
+			<input type="range" id="spawnSpeed" min="10" max="200" value="50" />
+		</div>
+		<div class="setting-item">
+			<label>自动生成便签</label>
+			<label class="toggle-switch">
+				<input type="checkbox" id="autoSpawn" checked />
+				<span class="slider"></span>
+			</label>
+		</div>
+		<div class="setting-item">
+			<label>显示动画效果</label>
+			<label class="toggle-switch">
+				<input type="checkbox" id="showAnimations" checked />
+				<span class="slider"></span>
+			</label>
+		</div>
+	</div>
+
+	<!-- 音乐播放器 -->
+	<div class="music-player">
+		<button id="settingsBtn" class="settings-btn">⚙</button>
+		<div class="track-info">
+			<div class="track-name" id="trackName">轻音乐 1</div>
+			<div class="track-artist" id="trackArtist">放松时光</div>
+		</div>
+		<div class="controls">
+			<button class="prev" id="prevBtn">⏮</button>
+			<button class="play" id="playBtn">▶</button>
+			<button class="next" id="nextBtn">⏭</button>
+		</div>
+		<div class="volume-control">
+			<span>🔊</span>
+			<input type="range" id="volumeSlider" min="0" max="100" value="70" />
+		</div>
+	</div>
+
+	<audio id="audio"></audio>
+
+	<script src="script.js"></script>
+</body>
+
+</html>

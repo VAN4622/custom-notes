@@ -1,0 +1,18 @@
+{
+  "name": "note-wall",
+  "version": "1.0.0",
+  "description": "多用户便签墙系统 - 基于 Neon 数据库",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'",
+    "deploy": "vercel --prod",
+    "setup:db": "node neon/setup.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.0"
+  },
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  }
+}
