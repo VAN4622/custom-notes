@@ -93,7 +93,7 @@ async function createWall() {
       const data = result[0]
       console.log('\n✅ 创建成功!')
       console.log('\n访问链接:')
-      console.log(`  https://your-domain.vercel.app/${slug}`)
+      console.log(`  https://notes.xihu.chat/${slug}`)
       console.log('\n配置信息:')
       console.log(`  ID: ${data.id}`)
       console.log(`  标题: ${data.title}`)

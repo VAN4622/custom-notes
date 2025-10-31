@@ -429,6 +429,103 @@ body.is-mobile #board {
 	border: none;
 }
 
+/* 欢迎遮罩 */
+.welcome-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(238, 238, 238, 0.15);
+	backdrop-filter: blur(30px) saturate(180%);
+	-webkit-backdrop-filter: blur(30px) saturate(180%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 100000;
+	opacity: 1;
+	transition: opacity 0.5s ease;
+}
+
+.welcome-overlay.hidden {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.welcome-card {
+	background: rgba(255, 255, 255, 0.75);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	padding: 48px 60px;
+	border-radius: 20px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+	text-align: center;
+	animation: welcomeFloat 0.6s ease;
+	border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+@keyframes welcomeFloat {
+	from {
+		opacity: 0;
+		transform: translateY(30px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+.welcome-emoji {
+	font-size: 64px;
+	margin-bottom: 20px;
+	animation: wave 1s ease infinite;
+}
+
+@keyframes wave {
+	0%, 100% {
+		transform: rotate(0deg);
+	}
+	25% {
+		transform: rotate(20deg);
+	}
+	75% {
+		transform: rotate(-20deg);
+	}
+}
+
+.welcome-title {
+	font-size: 36px;
+	font-weight: 700;
+	color: rgba(0, 0, 0, 0.8);
+	margin-bottom: 32px;
+	letter-spacing: 1px;
+}
+
+.enter-btn {
+	padding: 14px 40px;
+	font-size: 16px;
+	font-weight: 600;
+	color: rgba(0, 0, 0, 0.7);
+	background: #ffd8a8;
+	border: 2px solid rgba(0, 0, 0, 0.08);
+	border-radius: 12px;
+	cursor: pointer;
+	box-shadow: 0 4px 12px rgba(255, 216, 168, 0.4);
+	transition: all 0.2s ease;
+	outline: none;
+}
+
+.enter-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(255, 216, 168, 0.5);
+	background: #ffc98a;
+}
+
+.enter-btn:active {
+	transform: translateY(0);
+	box-shadow: 0 2px 8px rgba(255, 216, 168, 0.4);
+}
+
 @media (max-width: 768px) {
 	.card {
 		width: 180px;
@@ -464,5 +561,24 @@ body.is-mobile #board {
 	.music-player .volume-control input[type="range"] {
 		flex: 1;
 		max-width: 200px;
+	}
+
+	.welcome-card {
+		padding: 40px 48px;
+		border-radius: 16px;
+	}
+
+	.welcome-emoji {
+		font-size: 56px;
+	}
+
+	.welcome-title {
+		font-size: 28px;
+		margin-bottom: 28px;
+	}
+
+	.enter-btn {
+		padding: 12px 36px;
+		font-size: 15px;
 	}
 }

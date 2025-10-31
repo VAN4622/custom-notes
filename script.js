@@ -64,6 +64,7 @@ let spawnIntervalId = null
 let currentTrackIndex = 0
 let isPlaying = false
 let isInitialized = false
+let hasUserInteracted = false
 
 document.body.classList.toggle('is-mobile', isMobile)
 
@@ -520,41 +521,11 @@ function initMusicPlayer() {
 	const volumeSlider = document.getElementById('volumeSlider')
 	const trackName = document.getElementById('trackName')
 	const trackArtist = document.getElementById('trackArtist')
-	let autoPlayAttempted = false
-
 	function updateTrackInfo() {
 		const track = musicTracks[currentTrackIndex]
 		trackName.textContent = track.name
 		trackArtist.textContent = track.artist
 		audio.src = track.src
-	}
-
-	function autoPlay() {
-		if (autoPlayAttempted || !audio.src || audio.src === window.location.href) {
-			return
-		}
-		autoPlayAttempted = true
-
-		const playPromise = audio.play()
-		if (playPromise !== undefined) {
-			playPromise.then(() => {
-				playBtn.textContent = '⏸'
-				isPlaying = true
-			}).catch(err => {
-				console.log('自动播放被阻止，等待用户交互')
-				// 添加一次性点击监听器，用户点击页面任何地方时自动播放
-				const startPlayOnInteraction = () => {
-					audio.play().then(() => {
-						playBtn.textContent = '⏸'
-						isPlaying = true
-						document.removeEventListener('click', startPlayOnInteraction)
-						document.removeEventListener('touchstart', startPlayOnInteraction)
-					}).catch(() => { })
-				}
-				document.addEventListener('click', startPlayOnInteraction, { once: true })
-				document.addEventListener('touchstart', startPlayOnInteraction, { once: true })
-			})
-		}
 	}
 
 	function togglePlay() {
@@ -618,22 +589,45 @@ function initMusicPlayer() {
 	})
 
 	updateTrackInfo()
+}
 
-	// 尝试自动播放
-	setTimeout(autoPlay, 500)
+// 欢迎遮罩功能
+function initWelcomeOverlay() {
+	const overlay = document.getElementById('welcomeOverlay')
+	const enterBtn = document.getElementById('enterBtn')
+	const audio = document.getElementById('audio')
 
-	// 设置音量为静音后自动播放（绕过某些浏览器限制）
-	audio.muted = true
-	audio.play().then(() => {
-		// 成功播放后取消静音
+	enterBtn.addEventListener('click', () => {
+		hasUserInteracted = true
+		
+		// 隐藏遮罩
+		overlay.classList.add('hidden')
+		
+		// 开始播放音乐
+		if (audio.src && audio.src !== window.location.href) {
+			audio.play().then(() => {
+				const playBtn = document.getElementById('playBtn')
+				playBtn.textContent = '⏸'
+				isPlaying = true
+			}).catch(err => {
+				console.log('音乐播放失败:', err)
+			})
+		}
+		
+		// 启动自动生成
+		if (settings.autoSpawn) {
+			startAutoSpawn()
+		}
+		
+		// 开始生成初始卡片
+		for (let i = 0; i < initialCardCount; i++) {
+			setTimeout(createCard, i * (isMobile ? 60 : 40))
+		}
+		
+		// 移除遮罩（延迟以等待动画完成）
 		setTimeout(() => {
-			audio.muted = false
-			playBtn.textContent = '⏸'
-			isPlaying = true
-		}, 100)
-	}).catch(() => {
-		// 如果还是失败，等待用户交互
-		audio.muted = false
+			overlay.remove()
+		}, 600)
 	})
 }
 
@@ -648,19 +642,12 @@ async function initApp() {
 		return
 	}
 
-	// 初始化卡片
-	for (let i = 0; i < initialCardCount; i++) {
-		setTimeout(createCard, i * (isMobile ? 60 : 40))
-	}
-
-	// 启动自动生成
-	if (settings.autoSpawn) {
-		startAutoSpawn()
-	}
-
-	// 初始化设置和音乐播放器
+	// 初始化设置和音乐播放器（但不开始生成卡片）
 	initSettings()
 	initMusicPlayer()
+	
+	// 初始化欢迎遮罩
+	initWelcomeOverlay()
 }
 
 // 窗口大小变化处理
