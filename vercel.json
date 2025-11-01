@@ -5,8 +5,24 @@
       "destination": "/api/:path*"
     },
     {
+      "source": "/admin",
+      "destination": "/public/admin.html"
+    },
+    {
+      "source": "/css/:path*",
+      "destination": "/public/css/:path*"
+    },
+    {
+      "source": "/js/:path*",
+      "destination": "/public/js/:path*"
+    },
+    {
+      "source": "/assets/:path*",
+      "destination": "/public/assets/:path*"
+    },
+    {
       "source": "/:path*",
-      "destination": "/index.html"
+      "destination": "/public/index.html"
     }
   ]
 }
