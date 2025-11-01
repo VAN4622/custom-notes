@@ -48,19 +48,27 @@ git push
 
 ```
 note-wall/
-├── public/                 # 前端文件
-│   ├── index.html         # 主页
-│   ├── admin.html         # 管理后台
-│   ├── css/               # 样式文件
-│   └── js/                # JavaScript 文件
-├── api/                   # API 接口
-│   ├── wall.js           # 获取便签墙配置
-│   └── admin/            # 管理后台 API
-├── database/             # 数据库相关
-│   ├── schema.sql        # 表结构
-│   └── setup.js          # 初始化脚本
-├── scripts/              # 工具脚本
-└── docs/                 # 文档
+├── index.html              # 主页
+├── admin.html              # 管理后台
+├── style.css               # 样式
+├── script.js               # 主页逻辑
+├── admin.js                # 管理后台逻辑
+├── api/                    # API 接口
+│   ├── wall.js            # 获取便签墙配置
+│   └── admin/             # 管理后台 API
+│       ├── auth.js        # 认证
+│       ├── create-wall.js # 创建便签墙
+│       ├── list-walls.js  # 列出便签墙
+│       └── delete-wall.js # 删除便签墙
+├── database/              # 数据库相关
+│   ├── schema.sql         # 表结构
+│   ├── setup.js           # 初始化脚本
+│   └── README.md          # 数据库说明
+├── scripts/               # 工具脚本
+│   └── create-wall.js     # CLI 创建便签墙
+├── package.json
+├── vercel.json
+└── README.md
 ```
 
 ## 使用方式
@@ -74,12 +82,14 @@ https://your-domain.vercel.app/
 
 ### 创建自定义便签墙
 
+方法 1：使用管理后台（推荐）
+
 1. 访问管理后台: https://your-domain.vercel.app/admin
 2. 使用 ADMIN_PASSWORD 登录
 3. 填写表单创建便签墙
 4. 访问: https://your-domain.vercel.app/your-slug
 
-### 使用 SQL 创建
+方法 2：使用 SQL
 
 在 Neon SQL Editor 中执行：
 
@@ -98,13 +108,13 @@ INSERT INTO note_walls (slug, title, messages, music_tracks, expires_at) VALUES
 
 note_walls 表字段：
 
-- id: 主键
-- slug: URL 路径（唯一）
+- id: 主键 (UUID)
+- slug: URL 路径，唯一
 - title: 页面标题
-- messages: 便签内容数组
-- music_tracks: 音乐列表
-- colors: 颜色配置
-- settings: 其他设置
+- messages: 便签内容数组 (JSONB)
+- music_tracks: 音乐列表 (JSONB)
+- colors: 颜色配置 (JSONB)
+- settings: 其他设置 (JSONB)
 - expires_at: 过期时间
 - created_at: 创建时间
 - updated_at: 更新时间
@@ -122,13 +132,45 @@ note_walls 表字段：
 
 获取指定 slug 的便签墙配置
 
+响应示例：
+```json
+{
+  "success": true,
+  "data": {
+    "title": "示例便签墙",
+    "messages": ["加油", "保持微笑"],
+    "musicTracks": [...],
+    "colors": [...],
+    "settings": {...}
+  }
+}
+```
+
 ### POST /api/admin/auth
 
 管理员认证
 
+请求：
+```json
+{
+  "password": "your-password"
+}
+```
+
 ### POST /api/admin/create-wall
 
 创建便签墙
+
+请求：
+```json
+{
+  "slug": "my-wall",
+  "title": "我的便签墙",
+  "messages": ["消息1", "消息2"],
+  "musicTracks": [...],
+  "expiresAt": "2024-12-31T00:00:00Z"
+}
+```
 
 ### GET /api/admin/list-walls
 
@@ -137,6 +179,13 @@ note_walls 表字段：
 ### POST /api/admin/delete-wall
 
 删除便签墙
+
+请求：
+```json
+{
+  "slug": "my-wall"
+}
+```
 
 ## 本地开发
 
@@ -165,7 +214,9 @@ npm run dev
 
 ### 音乐无法播放
 
-确保音乐链接支持 CORS 且使用 HTTPS。
+1. 确保音乐链接支持 CORS
+2. 使用 HTTPS 链接
+3. 浏览器可能阻止自动播放，点击"进入"按钮后会自动播放
 
 ### 管理后台无法登录
 
@@ -174,6 +225,10 @@ npm run dev
 ### 首次访问较慢
 
 Neon 免费版会自动休眠，首次访问需要几秒唤醒。
+
+### 部署后静态文件 404
+
+确保 vercel.json 配置正确，文件路径使用相对路径。
 
 ## 许可证
 
